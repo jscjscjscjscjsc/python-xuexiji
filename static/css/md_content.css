@@ -319,3 +319,27 @@
   background: var(--border-glow, #30363d);
   border-radius: 3px;
 }
+
+/* ── 正文插图 ────────────────────────────────────────────────
+   由 tools/md2html.py 的 .md-img 生成。
+   课程截图不一定随仓库提交，图片加载失败时 img 上的 onerror 会把它
+   自己移除，只剩图注——不会出现满屏裂图图标。 */
+.md-content .md-img,
+.kp-body .md-img {
+  margin: 18px 0;
+  text-align: center;
+}
+.md-content .md-img img,
+.kp-body .md-img img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid var(--border-glow, #30363d);
+}
+.md-content .md-img figcaption,
+.kp-body .md-img figcaption {
+  margin-top: 8px;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--text-muted, #6e7681);
+}

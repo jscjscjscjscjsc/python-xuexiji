@@ -279,7 +279,7 @@ for part in graph.stream(initial, stream_mode=&quot;updates&quot;, version=&quot
 <p>验收：改变 <code class="md-inline">retrieve</code> 的输出时只影响下游状态；空检索能够拒答；学生能说明图为何必须 compile。</p>
 <p><strong>运行验证</strong>：</p>
 <div class="md-codeblock" data-lang="powershell"><div class="md-codebar"><span class="md-codelang">powershell</span><button type="button" class="md-copy" onclick="copyBlock(this)">复制</button></div><pre><code class="language-powershell">python code/ch05/10_langgraph_basic.py</code></pre></div>
-<p>!<a href="../assets/ch05/01_langgraph_basic.png" target="_blank" rel="noopener">LangGraph 最小状态图的真实输出：两节点线性图的运行轨迹、Mermaid 图结构自动导出、以及「没有 reducer 时返回字段是覆盖不是追加」的关键陷阱实验</a></p>
+<p><figure class="md-img"><img src="../assets/ch05/01_langgraph_basic.png" alt="LangGraph 最小状态图的真实输出：两节点线性图的运行轨迹、Mermaid 图结构自动导出、以及「没有 reducer 时返回字段是覆盖不是追加」的关键陷阱实验" loading="lazy" onerror="this.remove()"><figcaption>LangGraph 最小状态图的真实输出：两节点线性图的运行轨迹、Mermaid 图结构自动导出、以及「没有 reducer 时返回字段是覆盖不是追加」的关键陷阱实验</figcaption></figure></p>
 <p><strong>这张图要看三件事</strong>：</p>
 <p><strong>（1）图结构输出可以直接进答辩报告。</strong> 图中打印了 <code class="md-inline">graph.get_graph().draw_mermaid()</code> 的真实输出：<code class="md-inline">__start__ → retrieve → generate → __end__</code>，并自动保存为 <code class="md-inline">code/ch05/outputs/10_langgraph_basic.mmd</code>。图上说明了为什么值得单独做这一步：</p>
 <blockquote class="md-quote"><p>图结构是「你和同事/评审之间的接口契约」。文字描述容易有歧义，<strong>一张自动生成的图则不会说谎</strong> —— 它直接来自 compile() 后的真实拓扑，而不是你手画的理想版本。改完代码重新生成一遍，就能确认改的是不是你想改的。</p></blockquote>
@@ -464,7 +464,7 @@ builder.add_edge(&quot;give_up&quot;, END)</code></pre></div>
 <p>循环的安全边界仍由程序控制。<code class="md-inline">max_retries</code> 不能只写在提示词里。</p>
 <p><strong>运行验证：条件路由与可控循环</strong>：</p>
 <div class="md-codeblock" data-lang="powershell"><div class="md-codebar"><span class="md-codelang">powershell</span><button type="button" class="md-copy" onclick="copyBlock(this)">复制</button></div><pre><code class="language-powershell">python code/ch05/20_conditional_loop.py</code></pre></div>
-<p>!<a href="../assets/ch05/02_conditional_loop.png" target="_blank" rel="noopener">条件路由、改写重试与循环控制的真实输出：首轮直命中只走 retrieve→generate（0 次改写）、口语化问题改写后命中（2 次改写）、重试耗尽走 give_up 安全退出，以及四条路由分支的执行轨迹</a></p>
+<p><figure class="md-img"><img src="../assets/ch05/02_conditional_loop.png" alt="条件路由、改写重试与循环控制的真实输出：首轮直命中只走 retrieve→generate（0 次改写）、口语化问题改写后命中（2 次改写）、重试耗尽走 give_up 安全退出，以及四条路由分支的执行轨迹" loading="lazy" onerror="this.remove()"><figcaption>条件路由、改写重试与循环控制的真实输出：首轮直命中只走 retrieve→generate（0 次改写）、口语化问题改写后命中（2 次改写）、重试耗尽走 give_up 安全退出，以及四条路由分支的执行轨迹</figcaption></figure></p>
 <p><strong>这张图要把 5.2.2 新增的 <code class="md-inline">retrieve_retry</code> / <code class="md-inline">generate_retry</code> 两个节点真正跑起来看</strong>：</p>
 <p><strong>（1）同一张图，四条路由分支全部实测通过。</strong> 截图里的验收表给出四种情形的结果：</p>
 <div class="md-table-wrap"><table class="md-table"><thead><tr><th>情形</th><th>行为</th><th>结果</th></tr></thead><tbody><tr><td>首轮直命中</td><td>0 次改写，走 <code class="md-inline">retrieve → generate</code></td><td>正确</td></tr><tr><td>口语化问题</td><td>改写后命中，标注「经问题改写后命中」</td><td>正确</td></tr><tr><td>重试耗尽</td><td>走 <code class="md-inline">give_up</code>，<strong>不编造、不死循环</strong></td><td>安全退出</td></tr><tr><td>上限为 0</td><td><code class="md-inline">max_retries=0</code> 时立即放弃</td><td>可控</td></tr></tbody></table></div>
@@ -553,7 +553,7 @@ resumed = approval_graph.invoke(Command(resume=True), config=config)</code></pre
 <ul><li><code class="md-inline">interrupt()</code> 需要 checkpointer 和 thread_id。</li><li>恢复时使用同一个 thread_id。</li><li>中断恢复后，包含 <code class="md-inline">interrupt()</code> 的节点会从头重新执行；中断前的副作用必须幂等。</li><li>不要用普通 <code class="md-inline">try/except</code> 吞掉框架用于中断的控制异常。</li><li>写操作应放在审批通过后的独立节点。</li></ul>
 <p><strong>运行验证：人工审批与幂等</strong></p>
 <div class="md-codeblock" data-lang="powershell"><div class="md-codebar"><span class="md-codelang">powershell</span><button type="button" class="md-copy" onclick="copyBlock(this)">复制</button></div><pre><code class="language-powershell">python code/ch05/21_human_approval.py</code></pre></div>
-<p>!<a href="../assets/ch05/03_human_approval.png" target="_blank" rel="noopener">人工审批的真实输出：批准路径走 Command(resume=True)→execute、拒绝路径走 cancel（execute 从未执行），同一 request_id 的重放幂等（外部只发布 1 次），以及「interrupt 之前的副作用会被重放」这一陷阱的实测（副作用被触发 2 次）</a></p>
+<p><figure class="md-img"><img src="../assets/ch05/03_human_approval.png" alt="人工审批的真实输出：批准路径走 Command(resume=True)→execute、拒绝路径走 cancel（execute 从未执行），同一 request_id 的重放幂等（外部只发布 1 次），以及「interrupt 之前的副作用会被重放」这一陷阱的实测（副作用被触发 2 次）" loading="lazy" onerror="this.remove()"><figcaption>人工审批的真实输出：批准路径走 Command(resume=True)→execute、拒绝路径走 cancel（execute 从未执行），同一 request_id 的重放幂等（外部只发布 1 次），以及「interrupt 之前的副作用会被重放」这一陷阱的实测（副作用被触发 2 次）</figcaption></figure></p>
 <p><strong>这张图里有本日最反直觉的一条实测结论，比验收通过更重要</strong>：</p>
 <p><strong>（1）两条路径都正确。</strong> 批准路径 <code class="md-inline">Command(resume=True) → execute</code>；拒绝路径 <code class="md-inline">Command(resume=False) → cancel</code>，而且<strong>拒绝时 <code class="md-inline">execute</code> 节点一次都没执行</strong>——图上强调了证据：<strong>「拒绝时的新息是最后一行，从未出现在已发布列表里」</strong>。这说明 <code class="md-inline">execute</code> 节点真的从未被调度，而不是"执行了又被撤销"。</p>
 <p><strong>（2）幂等保护：同一 <code class="md-inline">request_id</code> 重复恢复不重复执行副作用。</strong> 这里把「重复」分成两种，必须分开讨论：</p>
@@ -604,7 +604,7 @@ python code/ch05/22_persistence.py --resume</code></pre></div>
 <p><strong>运行验证：跨进程恢复</strong>：</p>
 <div class="md-codeblock" data-lang="powershell"><div class="md-codebar"><span class="md-codelang">powershell</span><button type="button" class="md-copy" onclick="copyBlock(this)">复制</button></div><pre><code class="language-powershell">python code/ch05/22_persistence.py --start    # 进程 1：跑到中断点后退出
 python code/ch05/22_persistence.py --resume   # 进程 2：从同一个 db 恢复</code></pre></div>
-<p>!<a href="../assets/ch05/04_persistence.png" target="_blank" rel="noopener">持久化的真实输出：两个独立进程接力（进程 1 跑到中断点退出，进程 2 从同一个 db 恢复并批准），checkpoint 表结构与父子指针，以及 thread 隔离验证</a></p>
+<p><figure class="md-img"><img src="../assets/ch05/04_persistence.png" alt="持久化的真实输出：两个独立进程接力（进程 1 跑到中断点退出，进程 2 从同一个 db 恢复并批准），checkpoint 表结构与父子指针，以及 thread 隔离验证" loading="lazy" onerror="this.remove()"><figcaption>持久化的真实输出：两个独立进程接力（进程 1 跑到中断点退出，进程 2 从同一个 db 恢复并批准），checkpoint 表结构与父子指针，以及 thread 隔离验证</figcaption></figure></p>
 <p><strong>这张图是本日最硬的一条证据——恢复发生在另一个进程里</strong>：</p>
 <p><strong>（1）跨进程恢复真的发生了。</strong> 终端明确标注：<strong>「两个子进程都已退出，上面的中断来自进程 1，恢复来自进程 2」</strong>，恢复后 <code class="md-inline">approved=True</code>、<code class="md-inline">executed_count=1</code>、最终 <code class="md-inline">next=()</code>（空，已结束）。这才是 <code class="md-inline">SqliteSaver</code> 与 <code class="md-inline">MemorySaver</code> 的分水岭：</p>
 <blockquote class="md-quote"><p>中断发生在<strong>上一个进程</strong>，恢复发生在<strong>这个进程</strong> —— 如果用的是 <code class="md-inline">MemorySaver</code>，这一步会找不到 thread（状态已随进程消失）。</p></blockquote>
@@ -1210,7 +1210,7 @@ initial_state: WorkflowState = {
 <ol><li>正常请求运行到审批中断，展示 checkpoint 和 thread_id。</li><li>批准后恢复并模拟发布，展示最终状态。</li><li>拒绝另一请求，确认 execute 节点没有运行。</li><li>注入空证据，展示审校退回和修改上限。</li><li>对同一 request_id 重复恢复，展示幂等保护。</li><li>输出 <code class="md-inline">updates</code>、<code class="md-inline">checkpoints</code> 或任务事件，按节点解释耗时和失败。</li></ol>
 <p><strong>运行验证：生产级流程 Agent 的六条路径</strong></p>
 <div class="md-codeblock" data-lang="powershell"><div class="md-codebar"><span class="md-codelang">powershell</span><button type="button" class="md-copy" onclick="copyBlock(this)">复制</button></div><pre><code class="language-powershell">python code/ch05/40_workflow_agent.py</code></pre></div>
-<p>!<a href="../assets/ch05/05_workflow_agent.png" target="_blank" rel="noopener">生产级流程 Agent 的真实输出：事件流按节点顺序展示 analyze→research→draft→review→(interrupt) 的执行轨迹、六条路径的验收结论表、以及对应课件评分量表的答辩要点</a></p>
+<p><figure class="md-img"><img src="../assets/ch05/05_workflow_agent.png" alt="生产级流程 Agent 的真实输出：事件流按节点顺序展示 analyze→research→draft→review→(interrupt) 的执行轨迹、六条路径的验收结论表、以及对应课件评分量表的答辩要点" loading="lazy" onerror="this.remove()"><figcaption>生产级流程 Agent 的真实输出：事件流按节点顺序展示 analyze→research→draft→review→(interrupt) 的执行轨迹、六条路径的验收结论表、以及对应课件评分量表的答辩要点</figcaption></figure></p>
 <p><strong>这张图是 Day25 的交付证明——把 5.5.6 的六条演示顺序一次跑完</strong>：</p>
 <p><strong>（1）事件流就是任务执行轨迹。</strong> 图里用 <code class="md-inline">stream(stream_mode='updates')</code> 观察一次完整流程的节点序列：</p>
 <div class="md-figure"><pre class="md-diagram">analyze → research → draft → review → (interrupt)</pre></div>

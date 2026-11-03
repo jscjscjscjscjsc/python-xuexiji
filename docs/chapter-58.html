@@ -255,8 +255,8 @@
 <div class="md-codeblock" data-lang="powershell"><div class="md-codebar"><span class="md-codelang">powershell</span><button type="button" class="md-copy" onclick="copyBlock(this)">复制</button></div><pre><code class="language-powershell">python code/ch08/10_lora_from_scratch.py</code></pre></div>
 <p>这个脚本不依赖 GPU，用纯 numpy 实现并验证：</p>
 <ol><li>构造两个矩阵 $W_0$（冻结）和 $A, B$（可训练）；</li><li>实现前向传播 $h = W_0x + BAx$；</li><li>实现反向传播，<strong>验证 $W_0$ 的梯度确实为零</strong>（这是"冻结"的含义）；</li><li>在一个合成任务上真的训练，打印 loss 下降曲线；</li><li>计算并打印参数量对比表。</li></ol>
-<p>!<a href="../assets/ch08/01_lora_from_scratch.png" target="_blank" rel="noopener">LoRA 原理验证：loss 下降曲线 + 参数量对比</a></p>
-<p>!<a href="../figures/ch08_lora_training.png" target="_blank" rel="noopener">LoRA 训练曲线</a></p>
+<p><figure class="md-img"><img src="../assets/ch08/01_lora_from_scratch.png" alt="LoRA 原理验证：loss 下降曲线 + 参数量对比" loading="lazy" onerror="this.remove()"><figcaption>LoRA 原理验证：loss 下降曲线 + 参数量对比</figcaption></figure></p>
+<p><figure class="md-img"><img src="../figures/ch08_lora_training.png" alt="LoRA 训练曲线" loading="lazy" onerror="this.remove()"><figcaption>LoRA 训练曲线</figcaption></figure></p>
 <p><strong>这个实验的教学价值</strong>：你会亲眼看到「只训练 0.4% 的参数，也能让 loss 降下来」。 比看一百遍公式都有用。</p>
 <blockquote class="md-quote"><p><strong>为什么第 3 步很重要</strong>：很多人能背出"LoRA 冻结原权重"， 但如果你没有亲手验证过 <code class="md-inline">W_0</code> 的梯度是零，你就不知道"冻结"在代码里到底是什么样的。 <strong>验证方式</strong>：反向传播后打印 <code class="md-inline">W_0.grad</code>，它应该是全零矩阵或 <code class="md-inline">None</code>。 这一个检查就能防止你把 <code class="md-inline">requires_grad</code> 设错却毫无察觉。</p></blockquote>
 <h3 class="md-h">六、当日验收</h3>
@@ -549,8 +549,8 @@ python code/ch08/20_qlora_colab.py --dry-run     # 只验证数据与配置，�
 <h3 class="md-h">四、动手：三种策略的真实对比</h3>
 <div class="md-codeblock" data-lang="powershell"><div class="md-codebar"><span class="md-codelang">powershell</span><button type="button" class="md-copy" onclick="copyBlock(this)">复制</button></div><pre><code class="language-powershell">python code/ch08/30_context_engineering.py</code></pre></div>
 <p>脚本会模拟一个 30 轮的长对话，对比三种策略：</p>
-<p>!<a href="../assets/ch08/02_context_engineering.png" target="_blank" rel="noopener">三种上下文策略的 token 增长曲线与终局对比</a></p>
-<p>!<a href="../figures/ch08_context_strategies.png" target="_blank" rel="noopener">上下文策略对比</a></p>
+<p><figure class="md-img"><img src="../assets/ch08/02_context_engineering.png" alt="三种上下文策略的 token 增长曲线与终局对比" loading="lazy" onerror="this.remove()"><figcaption>三种上下文策略的 token 增长曲线与终局对比</figcaption></figure></p>
+<p><figure class="md-img"><img src="../figures/ch08_context_strategies.png" alt="上下文策略对比" loading="lazy" onerror="this.remove()"><figcaption>上下文策略对比</figcaption></figure></p>
 <p><strong>实测结果（真实 tiktoken 计数，30 轮对话）</strong>：</p>
 <div class="md-table-wrap"><table class="md-table"><thead><tr><th>策略</th><th style="text-align:right">第 30 轮上下文 token</th><th style="text-align:right">相对直接拼接</th><th>说明</th></tr></thead><tbody><tr><td>① 直接拼接（无裁剪）</td><td style="text-align:right">3,597</td><td style="text-align:right">100%</td><td>线性增长，永不回落</td></tr><tr><td>② 滑动窗口（预算 3000）</td><td style="text-align:right"><strong>1,423</strong></td><td style="text-align:right"><strong>40%</strong></td><td>到第 11 轮后稳定在预算线上</td></tr><tr><td>③ 摘要压缩（保留最近 6 条）</td><td style="text-align:right">704</td><td style="text-align:right"><strong>20%</strong></td><td>曲线在第 5 轮后走平</td></tr></tbody></table></div>
 <p><strong>但这里有一个必须讲清的陷阱</strong> —— 看右图的橙色部分：</p>

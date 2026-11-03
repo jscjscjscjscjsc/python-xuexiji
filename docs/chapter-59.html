@@ -413,8 +413,8 @@ docker compose -f code/ch09/21_docker_compose.yml up</code></pre></div>
 <div class="md-codeblock" data-lang="powershell"><div class="md-codebar"><span class="md-codelang">powershell</span><button type="button" class="md-copy" onclick="copyBlock(this)">复制</button></div><pre><code class="language-powershell">python code/ch09/30_llmops_dashboard.py</code></pre></div>
 <p>脚本会：</p>
 <ol><li>从历史运行记录中统计每日调用量、token 消耗、成本、失败率、P50/P95 延迟；</li><li>画趋势图（便于发现异常拐点）；</li><li>执行成本预警逻辑。</li></ol>
-<p>!<a href="../assets/ch09/01_llmops_dashboard.png" target="_blank" rel="noopener">LLMOps 监控面板</a></p>
-<p>!<a href="../figures/ch09_llmops.png" target="_blank" rel="noopener">LLMOps 成本与质量趋势</a></p>
+<p><figure class="md-img"><img src="../assets/ch09/01_llmops_dashboard.png" alt="LLMOps 监控面板" loading="lazy" onerror="this.remove()"><figcaption>LLMOps 监控面板</figcaption></figure></p>
+<p><figure class="md-img"><img src="../figures/ch09_llmops.png" alt="LLMOps 成本与质量趋势" loading="lazy" onerror="this.remove()"><figcaption>LLMOps 成本与质量趋势</figcaption></figure></p>
 <blockquote class="md-quote"><p><strong>读图的三个要点</strong>：</p>
 <ol><li><strong>看趋势而不是看绝对值</strong>：某天成本高可能是正常的业务高峰，</li><li><strong>把 P95 和成本放在一起看</strong>：延迟上升往往伴随 token 增加（上下文变长），</li><li><strong>失败率要看状态码分布</strong>，不只看总数 —— 429（限流）和 5xx（上游故障）</li></ol></blockquote>
 <h4 class="md-h">成本预警的三条规则（实践经验）</h4>
@@ -571,7 +571,7 @@ docker compose -f code/ch09/21_docker_compose.yml up</code></pre></div>
 <div class="md-codeblock" data-lang="powershell"><div class="md-codebar"><span class="md-codelang">powershell</span><button type="button" class="md-copy" onclick="copyBlock(this)">复制</button></div><pre><code class="language-powershell">python code/ch09/40_graduation_checklist.py</code></pre></div>
 <p>这个脚本会检查你的项目：</p>
 <ul><li>结构完整性（必要文件是否齐全）；</li><li>代码规范（硬编码密钥、模块可导入性）；</li><li>交付物完整性（README / 评测报告 / 架构图 / Dockerfile）；</li><li>输出「通过 / 不通过 / 缺失」清单。</li></ul>
-<p>!<a href="../assets/ch09/02_graduation_checklist.png" target="_blank" rel="noopener">毕业项目自检：结构完整性、代码规范、交付物清单</a></p>
+<p><figure class="md-img"><img src="../assets/ch09/02_graduation_checklist.png" alt="毕业项目自检：结构完整性、代码规范、交付物清单" loading="lazy" onerror="this.remove()"><figcaption>毕业项目自检：结构完整性、代码规范、交付物清单</figcaption></figure></p>
 <blockquote class="md-quote"><p><strong>自检脚本本身也是一个交付物</strong>。 面试时你可以说：「我写了一个自检脚本，能验证项目结构和规范」—— 这比说「我代码写得规范」有说服力得多，因为前者可执行、可复现。 <strong>能被自动化验证的规范，才是真的规范。</strong></p></blockquote>
 <p><strong>毕业标准</strong>（全部满足才算通过）：</p>
 <ul><li>[ ] 完整链路可运行（前端 → 后端 → 模型 → 数据）</li><li>[ ] 有评测数据，且包含<strong>一次改动的前后对比</strong></li><li>[ ] 有成本数据，且实现了成本护栏</li><li>[ ] 有 Dockerfile 且验证过（或明确说明未验证的原因）</li><li>[ ] 有安全自查清单，密钥管理合规</li><li>[ ] README 满足七块结构</li><li>[ ] 能回答答辩问题清单里的所有架构类与安全类问题</li></ul>

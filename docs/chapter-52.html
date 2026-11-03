@@ -319,7 +319,7 @@ class AsyncLLMClient:
 <p><strong>运行验证</strong>：</p>
 <div class="md-codeblock" data-lang="powershell"><div class="md-codebar"><span class="md-codelang">powershell</span><button type="button" class="md-copy" onclick="copyBlock(this)">复制</button></div><pre><code class="language-powershell">python code/ch02/10_async_basics.py      # 三组对照实验
 python code/ch02/11_async_client.py      # 异步客户端 + 异常隔离</code></pre></div>
-<p>!<a href="../assets/ch02/01_async_basics.png" target="_blank" rel="noopener">串行 vs 并发 vs 限流</a></p>
+<p><figure class="md-img"><img src="../assets/ch02/01_async_basics.png" alt="串行 vs 并发 vs 限流" loading="lazy" onerror="this.remove()"><figcaption>串行 vs 并发 vs 限流</figcaption></figure></p>
 <p><strong>实测数据（本机运行结果，可直接写进实验报告）</strong>：</p>
 <div class="md-table-wrap"><table class="md-table"><thead><tr><th>模式</th><th style="text-align:right">总耗时</th><th style="text-align:right">加速比</th><th style="text-align:right">峰值并发</th><th style="text-align:right">理论下界</th></tr></thead><tbody><tr><td>① 串行</td><td style="text-align:right">3.64s</td><td style="text-align:right">1.00x</td><td style="text-align:right">1</td><td style="text-align:right">3.60s</td></tr><tr><td>② 无序并发</td><td style="text-align:right"><strong>1.02s</strong></td><td style="text-align:right"><strong>3.57x</strong></td><td style="text-align:right">6</td><td style="text-align:right">1.00s</td></tr><tr><td>③ 限流并发（Semaphore=2）</td><td style="text-align:right">1.81s</td><td style="text-align:right">2.01x</td><td style="text-align:right">2</td><td style="text-align:right">1.80s</td></tr></tbody></table></div>
 <p><strong>四条结论（必须理解，不只是看到数字）</strong>：</p>
@@ -328,7 +328,7 @@ python code/ch02/11_async_client.py      # 异步客户端 + 异常隔离</code>
 <div class="md-figure"><pre class="md-diagram">asyncio.sleep(0.5) × 2 并发 ：0.51s   ← 让出执行权，等待可以被重叠
 time.sleep(0.5)    × 2 并发 ：1.00s   ← 独占事件循环，退化成串行</pre></div>
 <p>在协程里用 <code class="md-inline">time.sleep()</code> 会<strong>阻塞整个事件循环</strong>，所有并发全部失效。 这是新手最容易犯的性能错误——代码"看起来是异步的"，但性能等于同步。</p>
-<p>!<a href="../assets/ch02/02_async_client.png" target="_blank" rel="noopener">异步客户端与异常隔离</a></p>
+<p><figure class="md-img"><img src="../assets/ch02/02_async_client.png" alt="异步客户端与异常隔离" loading="lazy" onerror="this.remove()"><figcaption>异步客户端与异常隔离</figcaption></figure></p>
 <p>异常隔离的要点：<strong>每个并发任务必须捕获自己的异常</strong>。 如果让异常逃逸到 <code class="md-inline">gather</code>，一家供应商失败会导致整批结果全部丢失。 图中演示了一个故意配错的供应商，验证其他供应商的结果不受影响。</p>
 <h3 class="md-h">2.1.7 v1.0 缺陷修复说明</h3>
 <div class="md-table-wrap"><table class="md-table"><thead><tr><th>原问题</th><th>后果</th><th>本版修复</th></tr></thead><tbody><tr><td><code class="md-inline">compare_providers</code> 用 <code class="md-inline">asyncio.Semaphore</code> / <code class="md-inline">perf_counter</code> 但片段内<strong>未 import</strong></td><td>复制报 <code class="md-inline">NameError</code></td><td>补齐 import，并提供完整可运行文件</td></tr><tr><td>只讲概念，<strong>没有真实耗时数据</strong></td><td>学生无法判断"异步到底快多少"</td><td>补三组对照实验与实测数据表</td></tr></tbody></table></div>
@@ -503,7 +503,7 @@ async def chat(payload: ChatRequest, llm: AsyncLLMClient = Depends(get_llm)) -&g
 <h3 class="md-h">2.2.4 接口测试</h3>
 <p><strong>运行验证</strong>：</p>
 <div class="md-codeblock" data-lang="powershell"><div class="md-codebar"><span class="md-codelang">powershell</span><button type="button" class="md-copy" onclick="copyBlock(this)">复制</button></div><pre><code class="language-powershell">python -m pytest code/ch02/21_api_test.py -v</code></pre></div>
-<p>!<a href="../assets/ch02/04_api_test.png" target="_blank" rel="noopener">接口测试：pytest 全部通过，覆盖 lifespan 生命周期、422 校验、502/504 错误映射</a></p>
+<p><figure class="md-img"><img src="../assets/ch02/04_api_test.png" alt="接口测试：pytest 全部通过，覆盖 lifespan 生命周期、422 校验、502/504 错误映射" loading="lazy" onerror="this.remove()"><figcaption>接口测试：pytest 全部通过，覆盖 lifespan 生命周期、422 校验、502/504 错误映射</figcaption></figure></p>
 <blockquote class="md-quote"><p class="md-callout md-warn"><strong>⚠️ v1.0 的严重缺陷（测试必然失败）</strong>： 原课件的测试用 <code class="md-inline">httpx.ASGITransport(app=app)</code> 直接调用接口，但 <strong><code class="md-inline">ASGITransport</code> 只走 ASGI 协议，不会执行 FastAPI 的 lifespan</strong> —— 也就是说 <code class="md-inline">app.state.llm</code> 根本不会被创建。</p>
 <p>后果：<code class="md-inline">test_health</code> 碰巧能过（它不依赖 llm），但只要测试打到 <code class="md-inline">/chat</code>， 就会 <code class="md-inline">AttributeError: 'State' object has no attribute 'llm'</code>。 学生按课件写测试，会发现"简单的能过、真的测不了"。</p>
 <p><strong>两种正确修法</strong>（课程代码用了第二种，更常用）：</p>
@@ -847,7 +847,7 @@ class SessionStore:
             <p><strong>运行验证</strong>：</p>
 <div class="md-codeblock" data-lang="powershell"><div class="md-codebar"><span class="md-codelang">powershell</span><button type="button" class="md-copy" onclick="copyBlock(this)">复制</button></div><pre><code class="language-powershell">python code/ch02/40_resilience.py      # 重试退避 + 滑动窗口限流
 python code/ch02/41_upload_logging.py  # 安全上传 + 结构化日志</code></pre></div>
-<p>!<a href="../assets/ch02/03_resilience.png" target="_blank" rel="noopener">重试退避与限流</a></p>
+<p><figure class="md-img"><img src="../assets/ch02/03_resilience.png" alt="重试退避与限流" loading="lazy" onerror="this.remove()"><figcaption>重试退避与限流</figcaption></figure></p>
 <p><strong>重试的三条纪律</strong>（图中用真实失败注入验证）：</p>
 <div class="md-table-wrap"><table class="md-table"><thead><tr><th>纪律</th><th>原因</th></tr></thead><tbody><tr><td><strong>只重试瞬时错误</strong>（429 / 5xx / 连接超时）</td><td>401（密钥错）、400（参数错）重试一百次也不会成功，只会浪费配额</td></tr><tr><td><strong>必须有次数上限</strong></td><td>无上限的重试会把一次故障放大成雪崩</td></tr><tr><td><strong>必须加随机抖动</strong></td><td>否则大量请求会在同一时刻重试，形成"重试风暴"再次打垮上游</td></tr></tbody></table></div>
 <p><strong>限流</strong>：图中演示连续调用触发滑动窗口限流。 注意原课件的 <code class="md-inline">SlidingWindowLimiter</code> <strong>缺 <code class="md-inline">asyncio.Lock</code> 和 <code class="md-inline">deque</code> 的 import</strong>， 复制会 <code class="md-inline">NameError</code> —— 本版已补齐。</p>
@@ -1115,7 +1115,7 @@ if __name__ == &quot;__main__&quot;:
 python code/ch02/20_api_basic.py
 # 终端 2
 python code/ch02/50_load_test.py</code></pre></div>
-<p>!<a href="../assets/ch02/05_load_test.png" target="_blank" rel="noopener">20 并发压测</a></p>
+<p><figure class="md-img"><img src="../assets/ch02/05_load_test.png" alt="20 并发压测" loading="lazy" onerror="this.remove()"><figcaption>20 并发压测</figcaption></figure></p>
 <p><strong>压测报告的必备字段</strong>（缺一个都不算合格）：</p>
 <div class="md-table-wrap"><table class="md-table"><thead><tr><th>字段</th><th>为什么必须有</th></tr></thead><tbody><tr><td>环境（CPU / 内存 / 模型 / 上游限额）</td><td>没有环境的性能数字没有意义</td></tr><tr><td>并发数与总请求数</td><td>20 并发和 200 并发是完全不同的结论</td></tr><tr><td>成功率 + 状态码分布</td><td>只看成功率会漏掉"部分请求 429"这种情况</td></tr><tr><td><strong>P50 与 P95 延迟</strong></td><td>平均值会掩盖长尾，而长尾决定用户体验</td></tr><tr><td>失败原因分析</td><td><strong>至少分析一个失败请求</strong>，不能只报数字</td></tr></tbody></table></div>
 <blockquote class="md-quote"><p><strong>v1.0 缺陷</strong>：原课件只有压测脚本的代码，<strong>没有任何真实运行输出</strong>。 学生无法判断"跑出来什么样才算正常"，也无法对照自己的结果。 本版补真实截图。</p></blockquote>

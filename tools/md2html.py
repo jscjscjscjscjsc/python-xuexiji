@@ -35,6 +35,23 @@ def _inline(text):
     text = _html.escape(text, quote=False)
     text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
     text = re.sub(r'(?<!\*)\*([^*\n]+)\*(?!\*)', r'<em>\1</em>', text)
+
+    # 图片规则必须排在链接前面。否则 ![图注](路径) 会先被链接规则吃掉，
+    # 页面上只剩一个孤零零的 "!" 加一段蓝色文字，图永远不出现——
+    # 这就是用户反馈的「图片出不来 / 解析失败」。
+    # alt 与 src 里可能带引号，属性值单独转义（正文已 escape(quote=False)，
+    # 这里只补引号，不能再整体转义一遍，否则 & 会被二次转义）。
+    def _figure(match):
+        alt = match.group(1).replace('"', '&quot;')
+        src = match.group(2).replace('"', '&quot;')
+        # 课程里引用的截图未必随仓库提交，缺图时让 img 自己消失、只留图注，
+        # 好过满屏裂图图标。
+        return (f'<figure class="md-img">'
+                f'<img src="{src}" alt="{alt}" loading="lazy" onerror="this.remove()">'
+                f'<figcaption>{match.group(1)}</figcaption>'
+                f'</figure>')
+
+    text = re.sub(r'!\[([^\]]*)\]\(([^)\s]+)\)', _figure, text)
     text = re.sub(r'\[([^\]]+)\]\(([^)\s]+)\)',
                   r'<a href="\2" target="_blank" rel="noopener">\1</a>', text)
 

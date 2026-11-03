@@ -663,7 +663,7 @@ python code/ch07/20_framework_anatomy.py
 # 生成架构文档（可作为作品集材料）
 python code/ch07/30_architecture_report.py</code></pre></div>
 <p><strong>运行验证：用迷你框架跑一个带工具调用的任务</strong></p>
-<p>!<a href="../assets/ch07/01_use_miniagent.png" target="_blank" rel="noopener">自研迷你框架的真实运行轨迹：ToolCallingAgent 的执行步骤表（llm 与 tool 交替、含耗时与内容摘要）、模型调用与工具调用次数统计，以及「换一个参数就换一套记忆」的四种记忆策略对比表</a></p>
+<p><figure class="md-img"><img src="../assets/ch07/01_use_miniagent.png" alt="自研迷你框架的真实运行轨迹：ToolCallingAgent 的执行步骤表（llm 与 tool 交替、含耗时与内容摘要）、模型调用与工具调用次数统计，以及「换一个参数就换一套记忆」的四种记忆策略对比表" loading="lazy" onerror="this.remove()"><figcaption>自研迷你框架的真实运行轨迹：ToolCallingAgent 的执行步骤表（llm 与 tool 交替、含耗时与内容摘要）、模型调用与工具调用次数统计，以及「换一个参数就换一套记忆」的四种记忆策略对比表</figcaption></figure></p>
 <p><strong>这张图要证明一件事：两百多行的框架能完成带工具调用的任务，所以「框架的本质就是分层 + 职责分离」不是一句空话。</strong></p>
 <p><strong>（1）执行轨迹把「框架做了什么」摊开给你看。</strong> 表格逐行给出步骤号、类型（<code class="md-inline">llm</code> 还是 <code class="md-inline">tool</code>）、耗时（ms）和内容摘要：</p>
 <div class="md-table-wrap"><table class="md-table"><thead><tr><th style="text-align:right">步骤</th><th>类型</th><th style="text-align:right">耗时(ms)</th><th>内容摘要</th></tr></thead><tbody><tr><td style="text-align:right">1</td><td>llm</td><td style="text-align:right">1.0</td><td>请求调用 <code class="md-inline">calculator</code></td></tr><tr><td style="text-align:right">1</td><td>tool</td><td style="text-align:right">0.1</td><td><code class="md-inline">23 * 17 + 8 = 399</code></td></tr><tr><td style="text-align:right">2</td><td>llm</td><td style="text-align:right">1.1</td><td>请求调用 <code class="md-inline">calculator</code></td></tr><tr><td style="text-align:right">2</td><td>tool</td><td style="text-align:right">0.0</td><td>×重复调用被拦截（loop detected）</td></tr><tr><td style="text-align:right">3</td><td>llm</td><td style="text-align:right">3.1</td><td>一般来说，公司都会按照劳动法和行业惯例来处理这类事项…</td></tr></tbody></table></div>
@@ -682,7 +682,7 @@ python code/ch07/30_architecture_report.py</code></pre></div>
 <ol><li>它解决什么问题？如果去掉它会怎样？</li><li>LangChain 在同一个位置是怎么做的？多了什么、少了什么？</li><li>如果让你给这个抽象加一个功能（比如重试），你会改哪里？</li></ol></blockquote>
 <p><strong>运行验证：与 LangChain / LangGraph 的逐层对照</strong></p>
 <div class="md-codeblock" data-lang="powershell"><div class="md-codebar"><span class="md-codelang">powershell</span><button type="button" class="md-copy" onclick="copyBlock(this)">复制</button></div><pre><code class="language-powershell">python code/ch07/20_framework_anatomy.py</code></pre></div>
-<p>!<a href="../assets/ch07/02_framework_anatomy.png" target="_blank" rel="noopener">迷你框架与 LangChain / LangGraph 的抽象对照实测：同一位置三方各做了什么、框架无法解决而真实框架必须解决的六类问题，以及第 7 节「对已安装框架做一次真实性核对」逐条打印候选导入路径是否存在</a></p>
+<p><figure class="md-img"><img src="../assets/ch07/02_framework_anatomy.png" alt="迷你框架与 LangChain / LangGraph 的抽象对照实测：同一位置三方各做了什么、框架无法解决而真实框架必须解决的六类问题，以及第 7 节「对已安装框架做一次真实性核对」逐条打印候选导入路径是否存在" loading="lazy" onerror="this.remove()"><figcaption>迷你框架与 LangChain / LangGraph 的抽象对照实测：同一位置三方各做了什么、框架无法解决而真实框架必须解决的六类问题，以及第 7 节「对已安装框架做一次真实性核对」逐条打印候选导入路径是否存在</figcaption></figure></p>
 <p><strong>这张图是「抽象同构，差别在护栏」这个结论的数据来源。它把 7.5 的对照表从"我写的"变成了"逐条核验过的"。</strong></p>
 <p><strong>（1）同一个位置，三方各做了什么——差异一目了然。</strong> 图上逐层对比了迷你框架、LangChain 与 LangGraph 在<strong>持久化、并行执行、流式事件、可观测性、生态适配器、状态校验、结构化输出</strong>七个位置上的做法。例如：持久化一栏，迷你框架是「无（进程重启即丢）」，而 LangGraph 是 <code class="md-inline">checkpointer</code>：每步存 <code class="md-inline">state</code>，可回放到任意历史点。图上把整张表压缩成一句必须记住的话：</p>
 <blockquote class="md-quote"><p><strong>「抽象骨架很便宜（约 1000 行），工程护栏很贵（数万行）。」</strong></p></blockquote>
