@@ -1,8 +1,47 @@
 # PyMaster — 3D Python 编程学习平台
 
-PyMaster 是面向 Python 初学者的本地互动学习平台，包含 9 个章节、40 个知识点、章节 CG、AI 助教、在线练习、知识星海与学习进度追踪。
+PyMaster 是面向 Python 初学者的本地互动学习平台，包含 44 个章节、439 个知识点、章节 CG、AI 助教、在线练习、知识星海与学习进度追踪。
 
 在线展示：[GitHub Pages](https://jscjscjscjscjsc.github.io/py-master/)
+
+## 先把代码拿到本地
+
+整个仓库 92MB，其中 65MB 是 `docs/`——在线演示站的导出副本，跟能不能跑起来无关。
+**完整 `git clone` 在国内经常中途断连**（实测：跑到 280 秒仍然 `unexpected disconnect`）。
+按目的选一条，别硬刚：
+
+**① 只想跑起来 / 只想读代码 → 下压缩包，15MB**
+
+<https://github.com/jscjscjscjscjsc/python-xuexiji/releases/latest/download/PyMaster-source.zip>
+
+解压即用，双击 `0-启动PyMaster.bat`。这个包不含 `docs/`，其余与 `main` 一致。
+
+**② 想提 PR → 稀疏克隆，先只拉骨架**
+
+```bash
+git clone --depth 1 --filter=blob:none --sparse https://github.com/jscjscjscjscjsc/python-xuexiji.git
+cd python-xuexiji
+git sparse-checkout set data static templates tools
+```
+
+`--filter=blob:none` 只下载目录树，checkout 时按需取文件，几秒完成；
+`sparse-checkout set` 那行决定你要哪些目录（上面这套能直接跑起来，约 25MB）。
+之后想看演示站，随时补：`git sparse-checkout add docs`。
+
+**③ 网络够好、要完整仓库**
+
+```bash
+git clone --depth 1 https://github.com/jscjscjscjscjsc/python-xuexiji.git
+```
+
+**④ 克隆卡在 `Receiving objects` 不动 → 换镜像前缀**
+
+```bash
+git clone --depth 1 https://ghfast.top/https://github.com/jscjscjscjscjsc/python-xuexiji.git
+```
+
+`ghfast.top` / `gh-proxy.com` / `ghproxy.net` 这类前缀只代理下载，不影响推送；
+提 PR 时把 remote 换回 `github.com` 原地址即可。
 
 ## 本地启动
 
