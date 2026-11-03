@@ -24,9 +24,9 @@ cd python-xuexiji
 git sparse-checkout set data static templates tools
 ```
 
-`--filter=blob:none` 只下载目录树，checkout 时按需取文件，几秒完成；
-`sparse-checkout set` 那行决定你要哪些目录（上面这套能直接跑起来，约 25MB）。
-之后想看演示站，随时补：`git sparse-checkout add docs`。
+`--filter=blob:none` 只下载目录树，checkout 时按需取文件；`sparse-checkout set`
+那行决定你要哪些目录。上面这套实测：骨架 6 秒、取目录 11 秒、落地 37MB，
+拿来就能跑。之后想看演示站，随时补：`git sparse-checkout add docs`。
 
 **③ 网络够好、要完整仓库**
 
